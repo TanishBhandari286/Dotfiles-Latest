@@ -1,0 +1,162 @@
+#!/usr/bin/env sh
+
+# #############################################################################
+# Do not delete the `UNIQUE_ID` line below, I use it to backup original files
+# so they're not lost when my symlinks are applied
+# UNIQUE_ID=do_not_delete_this_line
+# #############################################################################
+
+# This command is the one that loads the scripting addition
+# Configure your user to execute `yabai --load-sa` as the root user without having to enter a password.
+#  https://github.com/koekeishiya/yabai/wiki/Installing-yabai-(latest-release)#configure-scripting-addition
+#
+
+# Unload the macOS WindowManager process
+launchctl unload -F /System/Library/LaunchAgents/com.apple.WindowManager.plist > /dev/null 2>&1 &
+
+
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+sudo yabai --load-sa
+yabai -m signal --add event=window_focused action="sketchybar --trigger window_focus"
+yabai -m signal --add event=display_added action="sleep 2 && $HOME/.config/yabai/create_spaces.sh"
+yabai -m signal --add event=display_removed action="sleep 1 && $HOME/.config/yabai/create_spaces.sh"
+yabai -m signal --add event=window_created action="sketchybar --trigger windows_on_spaces"
+yabai -m signal --add event=window_destroyed action="sketchybar --trigger windows_on_spaces"
+
+$HOME/.config/yabai/create_spaces.sh
+
+
+#                                 Paddings
+###############################################################################
+
+# Top padding for felixkratz sketchybar
+ yabai -m config top_padding 45
+# Top padding for default sketchybar
+# yabai -m config top_padding 25
+ yabai -m config bottom_padding 05
+ yabai -m config left_padding 05
+ yabai -m config right_padding 05
+
+###############################################################################
+#                               Transparency
+###############################################################################
+
+yabai -m config window_opacity on
+
+# Make the below apps transparent
+apps_transparent="(wezterm|Zen Browser|Telegram|Visual Studio Code|Brave Browser)"
+yabai -m signal --add event=window_focused app="^${apps_transparent}$" action="yabai -m config active_window_opacity 0.85"
+yabai -m signal --add event=window_focused app="^${apps_transparent}$" action="yabai -m config normal_window_opacity 0.00001"
+
+# When any other app gains focus, reset both active and background window opacity to fully visible
+yabai -m signal --add event=window_focused app!="^${apps_transparent}$" action="yabai -m config active_window_opacity 1.0"
+yabai -m signal --add event=window_focused app!="^${apps_transparent}$" action="yabai -m config normal_window_opacity 1.0"
+
+# yabai -m signal --add event=window_focused app=".*CleanShot X.*" action="yabai -m config active_window_opacity 1.0"
+# yabai -m signal --add event=window_focused app=".*CleanShot X.*" action="yabai -m config normal_window_opacity 1.0"
+
+###############################################################################
+#                             layer=normal
+###############################################################################
+
+# https://github.com/koekeishiya/yabai/issues/1929
+
+# Set all apps to the "normal" layer, otherwise they all start on the "below"
+# layer. Doing this fixed the issue I had with floating windows with OBS,
+# davinci resolve and other apps where their floating windows would show on top
+# of other apps
+
+yabai -m rule --add app=".*" layer=normal
+
+###############################################################################
+#                              Excluded apps
+###############################################################################
+
+# Apps excluded from window management, so you can resize them and move them around
+# Exclude problematic apps from being managed:
+yabai -m rule --add app="^(Software Update|Dictionary|VLC|System Preferences|System Settings|zoom.us|Photo Booth|Archive Utility|App Store|Activity Monitor)$" manage=off
+yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
+yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
+
+yabai -m config layout bsp
+
+# In case you want to debug and see the contents of a variable
+# echo "apps_mgoff_below: $apps_mgoff_below" >> /tmp/yabai_debug.log
+
+###############################################################################
+#                                  Misc
+###############################################################################
+
+# global settings
+# When I leave youtube or chrome, hammerspoon will move the mouse to the corner
+
+# "mouse_follows_focus on" will move the mouse back to the center, but DISABLE it or it will
+# be a nightmare to use iStat Menus
+yabai -m config mouse_follows_focus on
+
+# I don't understand what this does, I've enabled and disabled it in the past,
+# and still don't get it
+yabai -m config window_topmost off
+
+###############################################################################
+#                              Signal events
+###############################################################################
+
+# Adds a signal that, when a window gains focus, triggers a custom action in SketchyBar
+# (presumably to update the status bar based on the focused window).
+# https://github.com/FelixKratz/dotfiles
+# I'm not sure what this does, I don't see a difference
+# Not sure if related to "skhd shortcuts should trigger the sketchybar event" in
+# the owner dotfiles
+
+yabai -m rule --add app="Zen Browser" space=^1
+yabai -m rule --add app="Wezterm" space=2
+yabai -m rule --add app="Code" space=3
+yabai -m rule --add app="Obsidian" space=4
+yabai -m rule --add app="Brave Browser" space=5
+
+
+# Yabai signal to detect focus change for any application and move the cursor
+# yabai -m signal --add event=window_focused action="cliclick m:0,0"
+# yabai -m signal --add event=window_focused app="Google Chrome" action="cliclick m:0,0"
+
+###############################################################################
+#                                Defaults
+###############################################################################
+yabai -m config external_bar               all:35:0     \
+                window_border              on           \
+                mouse_follows_focus        off          \
+                focus_follows_mouse        off          \
+                window_zoom_persist        off          \
+                window_placement           second_child \
+                window_topmost             off          \
+                window_shadow              float        \
+                window_opacity             off          \
+                window_opacity_duration    0.0          \
+                active_window_opacity      1.0          \
+                normal_window_opacity      0.0          \
+                window_border_width        2            \
+                window_border_hidpi        off          \
+                window_border_radius       11           \
+                window_border_blur         off          \
+                window_animation_duration  0            \
+                active_window_border_color 0xffe1e3e4   \
+                normal_window_border_color 0xff494d64   \
+                insert_feedback_color      0xff9dd274   \
+                split_ratio                0.50         \
+                auto_balance               off          \
+                mouse_modifier             fn           \
+                mouse_action1              move         \
+                mouse_action2              resize       \
+                mouse_drop_action          swap         \
+                                                        \
+                top_padding                1            \
+                bottom_padding             4            \
+                left_padding               4            \
+                right_padding              4            \
+                window_gap                 6
+
+
+borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0 &
+echo "yabai configuration loaded.."
+
