@@ -60,10 +60,13 @@ alias .3='cd ../../..'
 alias .4='cd ../../../..'
 alias .5='cd ../../../../..'
 alias batfzf='fzf --preview='bat {}''
+alias yr='~/.config/yabai/scripting-addition.sh'
+alias syncup='~/automation/backup_to_clg.sh'
 alias nvimfzf='nvim $(fzf --preview='bat {}')'
 alias upgrade='brew update && brew upgrade'
-alias tanish='brew install --cask obsidian font-jetbrains-mono-nerd-font wezterm visual-studio-code intellij-idea brave-browser zen-browser whatsapp telegram discord slack google-drive microsoft-office stremio aldente balenaetcher chatgpt font-hack-nerd-font iina jdownloader raycast spacedrive tailscale the-unarchiver zed ghostty localsend raycast jellyfin-media-player font-meslo-lg-nerd-font font-symbols-only-nerd-font forklift trex obs font-hack-nerd-font clockify'
+alias tanish='brew install --cask obsidian font-jetbrains-mono-nerd-font wezterm visual-studio-code intellij-idea brave-browser zen-browser whatsapp telegram discord slack google-drive microsoft-office stremio aldente balenaetcher chatgpt font-hack-nerd-font iina jdownloader raycast spacedrive tailscale the-unarchiver zed ghostty localsend raycast font-meslo-lg-nerd-font font-symbols-only-nerd-font forklift trex obs font-hack-nerd-font clockify'
 alias bhandari='brew install zoxide fzf nushell eza starship bat carapace zsh-autosuggestions zsh-syntax-highlighting ripgrep thefuck nvim ansible lazygit tmux fastfetch onefetch yazi ranger gcc make cmake go jq b2-tools node fd sesh git ffmpegthumbnailer ffmpeg sevenzip poppler fd imagemagick borders sketchybar'
+alias syncblog='~/blog/tanishblog/updateblog.sh'
 
 
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
